@@ -1,0 +1,266 @@
+<!-- 
+# @Time    : 2021.6.9
+# @Author  : Aman 
+-->
+
+<html>
+<head>
+    <title>Arxiv Search</title>
+    <meta name="viewport" content="width=device-width, initial-scale=0.3,  maximum-scale=2.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <style>
+        body {
+            height: 100%;
+            width: 100%;
+            min-width: 1000px;
+        }
+        .blank {
+            height: 20%;
+        }
+        .search {
+            /* background-color: lawngreen; */
+            color: red;
+        }
+        #search_box {
+            height: 48px;
+            border-radius: 10px 0px 0px 10px;
+            font-size: 20px;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+        #search_btn {
+            background-color: rgb(176, 6, 6);
+            height: 48px;
+            border-radius: 0px 10px 10px 0px;
+            font-size: 20px; 
+        }
+
+        .t-right-bar {
+            position: fixed;
+            right: 0;
+            bottom: 10%;
+            width: 48px;
+            height: 48px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .t-right-bar > div {
+            float: left;
+            height: 45px;
+            line-height: 45px;
+            margin-bottom: 1px;
+            border-radius: 20px 0 0 20px;
+            color: #fff;
+            padding-left: 25%;
+            clear: both;
+            white-space: nowrap;
+            font-size: 13px;
+            font-style: normal;
+            background-color: #aaa;
+            background-repeat: no-repeat;
+            /* background-position: 12px center; */
+            transition: transform .2s cubic-bezier(.215, .61, .355, 1), padding .2s cubic-bezier(.215, .61, .355, 1), margin .2s cubic-bezier(.215, .61, .355, 1), background-color .2s cubic-bezier(.215, .61, .355, 1)
+        }
+
+        .t-right-bar > div.active, .t-right-bar > div:hover {
+            transform: translateX(-100%);
+            /* padding-left: 45px; */
+            padding-right: 10px;
+            margin-left: 48px;
+            background-color: #23a0e1;
+            text-decoration: none;
+            color: #fff
+        }
+
+        .t-right-bar img {
+            height: 36px;
+            width: 36px;
+            vertical-align: middle;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header" id="top">
+            <div class="row">
+                <div class="col-md-1">
+                    <a href="https://arxiv.org/"><img src="../static/imgs/logo.jpg" style="height: 60px; margin: 0px;"></a>
+                </div>
+                <div class="col-md-2">
+                    <h1 style="font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 30px; margin: 0px;">
+                        <a href="/" style="text-decoration:none">arXiv<br/>Search</a>
+                    </h1>
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group col-md-10">
+                        <form id="searchform" action="#" method="post">
+                            <div class="row" style="margin-top:10px;">
+                                <div class="col-md-10" style="padding-right: 0px;">
+                                    <span class="input-group-btn">
+                                         <input class="form-control" id="search_box" name="text" value="{{ text }}" required="required" onKeyUp="value=value.replace(/[^\w+\s\-\_\:\'\,$]/g, '')">
+                                     </span>
+                                 </div>
+                                 <div class="col-md-2" style="padding-left: 0px;">
+                                    <button class="btn btn-info btn-search btn-block" id="search_btn" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                                 </div>
+                            </div>
+                            <!-- <div class="row" style="text-align: left; font-size: 20px; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-3">
+                                    <label>
+                                        <input type="radio" class="radio-inline" name="searchtype" value="title" checked>
+                                        <span style="color: rgb(0, 0, 0); vertical-align: middle;">Title</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>
+                                        <input type="radio" class="radio-inline" name="searchtype" checked="checked" value="abstract">
+                                        <span style="color: rgb(0, 0, 0); vertical-align: middle;">Abstract</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>
+                                        <input type="radio" class="radio-inline" name="searchtype" value="author">
+                                        <span style="color: rgb(0, 0, 0); vertical-align: middle;">Author</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div> -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        <div class="row">
+            <div class="col-md-12" style="font-size: 10px; padding: 0px;">
+                {{ N }} Results &nbsp; Time cost: {{cost_time}}s 
+            </div>
+        </div>
+
+        <hr style="width: 100%; color: #0e0320;"/>
+
+        {% for item in res %}
+        <div class="row">
+            <div class="col-md-12" style="font-size: 20px; padding: 0px;">
+                <span id="{{loop.index}}_title">{{item['title']}}</span>
+                <span style="font-size: 15px; float: right;"> scroe: {{ item['score'] }} </span>
+            </div>
+
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                </svg>
+                <span class="info" style="display: none;">Authors: </span>
+                <span id="{{loop.index}}_authors">{{ item['authors'] }}</span>
+                <span style="float: right;">
+                    <a href="{{ item['pdf_link'] }}">{{ item["pdf_link"] }}</a>
+                </span>
+            </div>
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-fill" viewBox="0 0 16 16">
+                <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5.5 1.5v2a1 1 0 0 0 1 1h2l-3-3z"/>
+                </svg>
+                <span class="info" style="display: none;">Abstract: </span>
+                <span id="{{loop.index}}_abstract">{{ item['abstract'] }}</span>
+                <span style="float: right;">
+                    {{ item['submitted_date'] }}
+                </span>
+            </div>
+        </div>
+        <hr style="width: 100%; color: #0e0320;"/>
+        {% endfor %}
+
+
+        <div class="t-right-bar">
+            <div class="t-bar-rocket" id="back-to-top"><img src="../static/imgs/rocket.png">TOP</div>
+        </div>
+
+
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <script>
+            // $(document).ready(function(){
+            //     $("#search_btn").click(function(){
+            //         var a = $("input[name='searchtype']:checked").val();
+            //         if(a=="title"){var newUrl = "/arxiv_search_tit/";}
+            //         if(a=="abstract"){var newUrl = "/arxiv_search_abs/";}
+            //         if(a=="author"){var newUrl = "/arxiv_search_aut/";}
+            //         $("#searchform").attr('action', newUrl);    //通过jquery为action属性赋值
+            //         $("#searchform").submit();    //提交ID为myform的表单
+            //     })
+            // });
+                
+            var stopWords = ['a','above','after','again','am','an','and','any','are','aren\'t','as','at','be','because',
+                 'been','before','being','below','between','both','but','by','can\'t','cannot','could','couldn\'t','did','didn\'t',
+                 'do','does','doesn\'t','doing','don\'t','down','during','each','few','for','from','further','hadn\'t',
+                 'hasn\'t','haven\'t','he','he\'d','he\'ll','he\'s','her','here','here\'s','hers','herself','him',
+                 'himself','his','how\'s','i','i\'d','i\'ll','i\'m','i\'ve','if','in','into','is','isn\'t','it','it\'s','its',
+                 'itself','let\'s','me','mustn\'t','my','myself','no','nor','not','of','off','on','once','or',
+                 'other','ought','our','ours','ourselves','out','over','own','same','shan\'t','she','she\'d','she\'ll','she\'s',
+                 'shouldn\'t','so','some','such','than','that','that\'s','the','their','theirs','them','themselves','then',
+                 'there','there\'s','these','they','they\'d','they\'ll','they\'re','they\'ve','this','those','through','to','too',
+                 'under','until','very','was','wasn\'t','we','we\'d','we\'ll','we\'re','we\'ve','were','weren\'t',
+                 'what\'s','when\'s','where\'s','while','who\'s','whom','why\'s','won\'t',
+                 'wouldn\'t','you','you\'d','you\'ll','you\'re','you\'ve','your','yours','yourself','yourselves'];
+
+            function heightLight(string, keyword) {
+                var reg = new RegExp(keyword, "gi");
+                string = string.replace(reg, function(txt){
+                    return `<span class="search">` + txt + "</span>";
+                })
+                return string;
+            }
+
+            function find(searchVal) {
+                searchVal = searchVal.trim().split(/\s+/);
+                for(var i = 1; i <= {{ N }}; i++ ){
+                    for(var j = 0; j < searchVal.length; j ++){
+                        if(stopWords.indexOf(searchVal[j]) > -1){
+                            continue;
+                        }
+                        else{
+                            let title = document.getElementById(i+'_title');
+                            let abstract = document.getElementById(i+'_abstract');
+                            let authors = document.getElementById(i+'_authors');
+                            var reg1 = /<script[^>]*>(.|\n)*<\/script>/gi;
+                            let titleText = title.innerHTML.replace(reg1, "");
+                            let abstractText = abstract.innerHTML.replace(reg1, "");
+                            let authorsText = authors.innerHTML.replace(reg1, "");
+                            let re = new RegExp(searchVal[j], "ig");
+                            title.innerHTML = heightLight(titleText, re);
+                            abstract.innerHTML = heightLight(abstractText, re);
+                            authors.innerHTML = heightLight(authorsText, re);
+                        }
+                    }
+                }
+            }
+            var text = String("{{text}}");
+            find(text);
+
+
+            $(".t-right-bar").hide();
+            $(function () {
+                $(window).scroll(function () {
+                    if ($(window).scrollTop() > 1000) {
+                        $(".t-right-bar").fadeIn(500);
+                    }
+                    else {
+                        $(".t-right-bar").fadeOut(500);
+                    }
+                });
+
+                $("#back-to-top").click(function () {
+                    $('body,html').animate({scrollTop: 0}, 500);
+                    return false;
+                });
+            });
+
+        </script>
+
+</body>
+</html>
